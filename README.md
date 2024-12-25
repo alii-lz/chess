@@ -1,2 +1,13 @@
 # chess-app
-Chess app
+
+## Tech Stack
+
+### Frontend:
+
+-   **React.js**
+-   **TailwindCSS**
+
+### Backend:
+
+-   **Java**
+-   **Springboot**
