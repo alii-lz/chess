@@ -4,7 +4,7 @@ import Board from "./Chess/Board.jsx";
 
 function App() {
     return (
-        <div>
+        <div className='bg-black'>
             <Navbar></Navbar>
             <div className='flex justify-center mt-6 h-screen'>
                 <Board></Board>
