@@ -3,6 +3,8 @@ import Pawn from "../Images/Pawn.svg";
 import Rook from "../Images/Rook.svg";
 
 const Board = () => {
+    // const chessBoard = ;
+
     const isPawnRow = (index) =>
         (index >= 8 && index <= 15) || (index >= 48 && index <= 55);
 
@@ -11,7 +13,7 @@ const Board = () => {
 
     return (
         <div className='grid grid-cols-8 grid-rows-8 w-1/2 h-3/4 border'>
-            {Array.from({ length: 64 }).map((_, index) => (
+            {/* {Array.from({ length: 64 }).map((_, index) => (
                 <div
                     key={index}
                     className='border flex justify-center items-center'
@@ -30,7 +32,7 @@ const Board = () => {
                         <img src={Rook} className='scale-50' />
                     )}
                 </div>
-            ))}
+            ))} */}
         </div>
     );
 };
