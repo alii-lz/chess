@@ -1,6 +1,3 @@
-import React from "react";
-// import Pawn from "../Images/Pawn.svg";
-// import Rook from "../Images/Rook.svg";
 import { Cell, Piece } from "../Types/Cell.ts";
 
 const initialBoard = [
@@ -17,59 +14,57 @@ const initialBoard = [
 const boardInit = () => {
     const chessBoard: Cell[] = [];
 
-    for (let i = 1; i <= 64; i++) {
+    for (let i = 0; i < 64; i++) {
         const row = Math.floor(i / 8);
         const col = i % 8;
         const isWhiteSquare = (row + col) % 2 === 0;
-        const isWhitePiece = row >= 7;
+        const pieceCode = initialBoard[row][col];
 
         let pieceType = "";
+        let isWhitePiece = false;
 
-        if (row === 2 || row === 7) {
-            pieceType = "Pawn";
-        }
+        if (pieceCode) {
+            isWhitePiece = pieceCode === pieceCode.toUpperCase();
 
-        if (row === 1 || row === 8) {
-            if (col === 1 || col === 8) {
-                pieceType = "Rook";
-            } else if (col === 2 || col === 7) {
-                pieceType = "Knight";
-            } else if (col === 3 || col === 6) {
-                pieceType = "Bishop";
-            }
-
-            // Set black King and Queen
-            if (row === 1) {
-                if (col === 4) {
+            switch (pieceCode.toLowerCase()) {
+                case "p":
+                    pieceType = "Pawn";
+                    break;
+                case "r":
+                    pieceType = "Rook";
+                    break;
+                case "n":
+                    pieceType = "Knight";
+                    break;
+                case "b":
+                    pieceType = "Bishop";
+                    break;
+                case "q":
                     pieceType = "Queen";
-                } else if (col === 5) {
+                    break;
+                case "k":
                     pieceType = "King";
-                }
-            }
-
-            // Set white King and Queen
-            if (row === 8) {
-                if (col === 4) {
-                    pieceType = "King";
-                } else if (col === 5) {
-                    pieceType = "Queen";
-                }
+                    break;
+                default:
+                    pieceType = "";
             }
         }
 
         const piece: Piece = {
-            color: isWhitePiece ? "#cdb081" : "#483624",
+            color: isWhitePiece ? "white" : "black",
             type: pieceType,
         };
 
         const cell: Cell = {
-            color: isWhiteSquare ? "#cdb081" : "#483624",
+            color: isWhiteSquare ? "white" : "black",
             currentPiece: piece,
             position: i,
         };
 
         chessBoard.push(cell);
     }
+
+    return chessBoard;
 };
 
 export default boardInit;
