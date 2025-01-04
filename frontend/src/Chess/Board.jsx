@@ -12,6 +12,13 @@ import { useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { DndProvider } from "react-dnd";
 
+// For the drag-n-drop library to only accept items of type "Piece"
+// So we can only drag and drop the chess pieces on the board
+const ItemTypes = {
+    PIECE: "PIECE",
+};
+
+// Maps piece names to their visual components
 const pieceComponents = {
     Pawn: PawnIcon,
     Rook: RookIcon,
@@ -21,10 +28,14 @@ const pieceComponents = {
     King: KingIcon,
 };
 
+// Renders a draggable piece
 const Piece = ({ type, Component, position, color }) => {
     const [{ isDragging }, drag] = useDrag({
-        item: { type: "piece", position, pieceType: type, color },
-        collect: (monitor) => ({ isDragging: !!monitor.isDragging() }),
+        type: ItemTypes.PIECE,
+        item: { position, pieceType: type, color },
+        collect: (monitor) => ({
+            isDragging: !!monitor.isDragging(),
+        }),
     });
 
     return (
@@ -37,15 +48,18 @@ const Piece = ({ type, Component, position, color }) => {
     );
 };
 
-const Square = ({ key, position, cell, movePiece }) => {
+// Represents a single square on the board
+const Square = ({ position, cell, movePiece }) => {
     const [{ isOver }, drop] = useDrop({
-        accept: "piece",
+        accept: ItemTypes.PIECE,
         drop: (item) => movePiece(item.position, position),
-        collect: (monitor) => ({ isOver: !!monitor.isOver() }),
+        collect: (monitor) => ({
+            isOver: !!monitor.isOver(),
+        }),
     });
 
     const renderPiece = (piece) => {
-        if (!piece) return null;
+        if (!piece || !piece.type) return null;
         const PieceIcon = pieceComponents[piece.type];
         return (
             <Piece
@@ -66,7 +80,9 @@ const Square = ({ key, position, cell, movePiece }) => {
                 opacity: isOver ? 0.5 : 1,
             }}
         >
-            {renderPiece(cell.currentPiece)}
+            {cell.currentPiece &&
+                cell.currentPiece.type &&
+                renderPiece(cell.currentPiece)}
         </div>
     );
 };
@@ -75,21 +91,15 @@ const Board = () => {
     const chessBoard = boardInit();
     const [board, setBoard] = React.useState(chessBoard);
 
-    const renderPiece = (piece) => {
-        const PieceIcon = pieceComponents[piece.type];
-        return PieceIcon ? <PieceIcon color={piece.color} /> : null;
-    };
-
     const movePiece = (from, to) => {
-        // logic to move the piece from one square to another
         const newBoard = [...board];
 
-        const targetPiece = newBoard[from.x][from.y].currentPiece;
-
-        newBoard[to.x][to.y].currentPiece = targetPiece;
-        newBoard[from.x][from.y].currentPiece = null;
-
-        setBoard(newBoard);
+        const targetPiece = newBoard[from].currentPiece;
+        if (targetPiece) {
+            newBoard[to].currentPiece = targetPiece;
+            newBoard[from].currentPiece = null;
+            setBoard(newBoard);
+        }
     };
 
     return (
