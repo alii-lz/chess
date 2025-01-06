@@ -29,20 +29,17 @@ const pieceComponents = {
 };
 
 // Renders a draggable piece
-const Piece = ({ type, Component, position, color }) => {
+const Piece = ({ pieceType, Component, position, color }) => {
     const [{ isDragging }, drag] = useDrag({
         type: ItemTypes.PIECE,
-        item: { position, pieceType: type, color },
+        item: { position, pieceType, color },
         collect: (monitor) => ({
             isDragging: !!monitor.isDragging(),
         }),
     });
 
     return (
-        <div
-            ref={drag}
-            style={{ opacity: isDragging ? 0.5 : 1, cursor: "move" }}
-        >
+        <div ref={drag}>
             <Component color={color} />
         </div>
     );
@@ -63,13 +60,15 @@ const Square = ({ position, cell, movePiece }) => {
         const PieceIcon = pieceComponents[piece.type];
         return (
             <Piece
-                type={piece.type}
+                pieceType={piece.type}
                 Component={PieceIcon}
                 position={position}
                 color={piece.color}
             />
         );
     };
+
+    const hasPiece = cell.currentPiece && cell.currentPiece.type;
 
     return (
         <div
@@ -78,11 +77,10 @@ const Square = ({ position, cell, movePiece }) => {
             style={{
                 background: cell.color === "white" ? "#cdb081" : "#483624",
                 opacity: isOver ? 0.5 : 1,
+                cursor: hasPiece ? "pointer" : "default",
             }}
         >
-            {cell.currentPiece &&
-                cell.currentPiece.type &&
-                renderPiece(cell.currentPiece)}
+            {hasPiece && renderPiece(cell.currentPiece)}
         </div>
     );
 };
@@ -90,28 +88,38 @@ const Square = ({ position, cell, movePiece }) => {
 const Board = () => {
     const chessBoard = boardInit();
     const [board, setBoard] = React.useState(chessBoard);
+    const [showMoves, setShowMoves] = React.useState(false);
 
     const movePiece = (from, to) => {
         const newBoard = [...board];
 
         const targetPiece = newBoard[from].currentPiece;
         if (targetPiece) {
-            newBoard[to].currentPiece = targetPiece;
             newBoard[from].currentPiece = null;
+            newBoard[to].currentPiece = targetPiece;
             setBoard(newBoard);
         }
     };
+
+    // when a piece is clicked
+    // set showMoves to true
+    // in the return statement:
+    //              showMoves && renderValidMoves();
+
+    const renderValidMoves = () => {};
 
     return (
         <DndProvider backend={HTML5Backend}>
             <div className='grid grid-cols-8 grid-rows-8 w-1/2 h-3/4 border'>
                 {board.map((cell, index) => (
-                    <Square
-                        key={index}
-                        position={index}
-                        cell={cell}
-                        movePiece={movePiece}
-                    />
+                    <button>
+                        <Square
+                            key={index}
+                            position={index}
+                            cell={cell}
+                            movePiece={movePiece}
+                        />
+                    </button>
                 ))}
             </div>
         </DndProvider>
