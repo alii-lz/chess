@@ -46,7 +46,7 @@ const Piece = ({ pieceType, Component, position, color }) => {
 };
 
 // Represents a single square on the board
-const Square = ({ position, cell, movePiece }) => {
+const Square = ({ position, cell, movePiece, onSquareClick }) => {
     const [{ isOver }, drop] = useDrop({
         accept: ItemTypes.PIECE,
         drop: (item) => movePiece(item.position, position),
@@ -79,6 +79,7 @@ const Square = ({ position, cell, movePiece }) => {
                 opacity: isOver ? 0.5 : 1,
                 cursor: hasPiece ? "pointer" : "default",
             }}
+            onClick={() => onSquareClick(cell)}
         >
             {hasPiece && renderPiece(cell.currentPiece)}
         </div>
@@ -106,20 +107,23 @@ const Board = () => {
     // in the return statement:
     //              showMoves && renderValidMoves();
 
-    const renderValidMoves = () => {};
+    const renderValidMoves = React.useCallback((cell) => {
+        console.log(cell);
+
+        setShowMoves(true);
+    }, []);
 
     return (
         <DndProvider backend={HTML5Backend}>
             <div className='grid grid-cols-8 grid-rows-8 w-1/2 h-3/4 border'>
                 {board.map((cell, index) => (
-                    <button>
-                        <Square
-                            key={index}
-                            position={index}
-                            cell={cell}
-                            movePiece={movePiece}
-                        />
-                    </button>
+                    <Square
+                        key={index}
+                        position={index}
+                        cell={cell}
+                        movePiece={movePiece}
+                        onSquareClick={renderValidMoves}
+                    />
                 ))}
             </div>
         </DndProvider>
