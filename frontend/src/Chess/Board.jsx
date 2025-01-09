@@ -46,7 +46,14 @@ const Piece = ({ pieceType, Component, position, color }) => {
 };
 
 // Represents a single square on the board
-const Square = ({ position, cell, movePiece, onSquareClick }) => {
+const Square = ({
+    position,
+    cell,
+    movePiece,
+    onSquareClick,
+    isValidMove,
+    isSelected,
+}) => {
     const [{ isOver }, drop] = useDrop({
         accept: ItemTypes.PIECE,
         drop: (item) => movePiece(item.position, position),
@@ -82,14 +89,47 @@ const Square = ({ position, cell, movePiece, onSquareClick }) => {
             onClick={() => onSquareClick(cell)}
         >
             {hasPiece && renderPiece(cell.currentPiece)}
+            {isValidMove && (
+                <div className='absolute w-4 h-4 rounded-full bg-gray-600 opacity-50' />
+            )}
+            {isSelected && (
+                <div className='absolute w-4 h-4 rounded-full bg-gray-600 opacity-50' />
+            )}
         </div>
     );
+};
+
+const getValidMoves = (pieceType, position, color, board) => {
+    const moves = [];
+    const row = Math.floor(position / 8);
+    const col = position % 8;
+
+    if (pieceType === "Pawn") {
+        const direction = color === "white" ? -1 : 1;
+
+        // Checks if its the pawn's first move
+        if (row === 2 || row === 7) {
+            const oneStepPosition = row + direction * 1;
+            const twoStepsPosition = row + direction * 2;
+
+            moves.push(oneStepPosition);
+            moves.push(twoStepsPosition);
+        } else {
+            // its a regular foward pawn move
+
+            const newPosition = row + direction * 1;
+            moves.push(newPosition);
+        }
+    }
+
+    return moves;
 };
 
 const Board = () => {
     const chessBoard = boardInit();
     const [board, setBoard] = React.useState(chessBoard);
-    const [showMoves, setShowMoves] = React.useState(false);
+    const [selectedPosition, setSelectedPosition] = React.useState(null);
+    const [validMoves, setValidMoves] = React.useState([]);
 
     const movePiece = (from, to) => {
         const newBoard = [...board];
@@ -99,19 +139,26 @@ const Board = () => {
             newBoard[from].currentPiece = null;
             newBoard[to].currentPiece = targetPiece;
             setBoard(newBoard);
+            setSelectedPosition(null);
+            setValidMoves([]);
         }
     };
 
-    // when a piece is clicked
-    // set showMoves to true
-    // in the return statement:
-    //              showMoves && renderValidMoves();
-
-    const renderValidMoves = React.useCallback((cell) => {
-        console.log(cell);
-
-        setShowMoves(true);
-    }, []);
+    const handleSquareClick = React.useCallback(
+        (cell) => {
+            console.log(cell);
+            setValidMoves(
+                getValidMoves(
+                    cell.currentPiece.type,
+                    cell.position,
+                    cell.color,
+                    board
+                )
+            );
+            console.log(validMoves);
+        },
+        [selectedPosition, board, validMoves]
+    );
 
     return (
         <DndProvider backend={HTML5Backend}>
@@ -122,7 +169,9 @@ const Board = () => {
                         position={index}
                         cell={cell}
                         movePiece={movePiece}
-                        onSquareClick={renderValidMoves}
+                        onSquareClick={handleSquareClick}
+                        isValidMove={validMoves.includes(index)}
+                        isSelected={selectedPosition === index}
                     />
                 ))}
             </div>
