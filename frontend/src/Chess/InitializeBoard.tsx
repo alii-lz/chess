@@ -11,6 +11,22 @@ const initialBoard = [
     ["R", "N", "B", "Q", "K", "B", "N", "R"],
 ];
 
+const toChessNotation = (position: number) => {
+    // Converts 0-7 to 1-8
+    const row = 8 - Math.floor(position / 8);
+    // Converts 0-7 to a-h
+    const col = String.fromCharCode(97 + (position & 8));
+    return `${col}${row}`;
+};
+
+const fromChessNotation = (notation: string) => {
+    // Converts 1-8 to 0-7
+    const row = 8 - parseInt(notation[1]);
+    // Convert a-h to 0-7
+    const col = notation.charCodeAt(0) - 97;
+    return row * 8 + col;
+};
+
 const boardInit = () => {
     const chessBoard: Cell[] = [];
 
@@ -59,6 +75,7 @@ const boardInit = () => {
             color: isWhiteSquare ? "white" : "black",
             currentPiece: piece,
             position: i,
+            notation: toChessNotation(i),
         };
 
         chessBoard.push(cell);

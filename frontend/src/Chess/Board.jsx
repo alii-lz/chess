@@ -104,20 +104,27 @@ const getValidMoves = (pieceType, position, color, board) => {
     const row = Math.floor(position / 8);
     const col = position % 8;
 
+    console.log(`current row is ${row}`);
+
     if (pieceType === "Pawn") {
         const direction = color === "white" ? -1 : 1;
+        console.log(
+            `current direction is ${direction} because color is ${color}`
+        );
 
         // Checks if its the pawn's first move
         if (row === 2 || row === 7) {
             const oneStepPosition = row + direction * 1;
             const twoStepsPosition = row + direction * 2;
 
+            console.log(`pushing onestep: ${oneStepPosition}`);
             moves.push(oneStepPosition);
+            console.log(`pushing twostep: ${twoStepsPosition}`);
             moves.push(twoStepsPosition);
         } else {
             // its a regular foward pawn move
-
             const newPosition = row + direction * 1;
+            console.log(`pushing regular forward move: ${newPosition}`);
             moves.push(newPosition);
         }
     }
@@ -151,7 +158,7 @@ const Board = () => {
                 getValidMoves(
                     cell.currentPiece.type,
                     cell.position,
-                    cell.color,
+                    cell.currentPiece.color,
                     board
                 )
             );
