@@ -84,4 +84,4 @@ const boardInit = () => {
     return chessBoard;
 };
 
-export default boardInit;
+export { boardInit, fromChessNotation, toChessNotation };
