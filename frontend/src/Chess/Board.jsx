@@ -7,7 +7,7 @@ import {
     RookIcon,
     PawnIcon,
 } from "./Icons.jsx";
-import boardInit from "./InitializeBoard.tsx";
+import { boardInit, fromChessNotation } from "./InitializeBoard.tsx";
 import { useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { DndProvider } from "react-dnd";
@@ -99,7 +99,18 @@ const Square = ({
     );
 };
 
-const getValidMoves = (pieceType, position, color, board) => {
+const getValidMoves = (cell, board) => {
+    const pieceType = cell.currentPiece.type;
+    const position = cell.position;
+    const pieceColor = cell.currentPiece.color;
+    const notation = cell.notation;
+
+    const actualPosition = fromChessNotation(notation);
+
+    console.log(
+        `position is ${position} and actualPosition is ${actualPosition}`
+    );
+
     const moves = [];
     const row = Math.floor(position / 8);
     const col = position % 8;
@@ -107,9 +118,9 @@ const getValidMoves = (pieceType, position, color, board) => {
     console.log(`current row is ${row}`);
 
     if (pieceType === "Pawn") {
-        const direction = color === "white" ? -1 : 1;
+        const direction = pieceColor === "white" ? -1 : 1;
         console.log(
-            `current direction is ${direction} because color is ${color}`
+            `current direction is ${direction} because pieceColor is ${pieceColor}`
         );
 
         // Checks if its the pawn's first move
@@ -154,14 +165,7 @@ const Board = () => {
     const handleSquareClick = React.useCallback(
         (cell) => {
             console.log(cell);
-            setValidMoves(
-                getValidMoves(
-                    cell.currentPiece.type,
-                    cell.position,
-                    cell.currentPiece.color,
-                    board
-                )
-            );
+            setValidMoves(getValidMoves(cell, board));
             console.log(validMoves);
         },
         [selectedPosition, board, validMoves]
