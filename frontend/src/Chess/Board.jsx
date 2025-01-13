@@ -7,10 +7,10 @@ import {
     RookIcon,
     PawnIcon,
 } from "./Icons.jsx";
-import { boardInit, fromChessNotation } from "./InitializeBoard.tsx";
-import { useDrag, useDrop } from "react-dnd";
+import { boardInit } from "./InitializeBoard.tsx";
+import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { DndProvider } from "react-dnd";
+import { getRowColfromBoardPosition, toBoardPosition } from "./Helpers.tsx";
 
 // For the drag-n-drop library to only accept items of type "Piece"
 // So we can only drag and drop the chess pieces on the board
@@ -101,21 +101,11 @@ const Square = ({
 
 const getValidMoves = (cell, board) => {
     const pieceType = cell.currentPiece.type;
-    const position = cell.position;
     const pieceColor = cell.currentPiece.color;
-    const notation = cell.notation;
+    const position = cell.position;
 
-    const actualPosition = fromChessNotation(notation);
-
-    console.log(
-        `position is ${position} and actualPosition is ${actualPosition}`
-    );
-
+    const { row, col } = getRowColfromBoardPosition(position);
     const moves = [];
-    const row = Math.floor(position / 8);
-    const col = position % 8;
-
-    console.log(`current row is ${row}`);
 
     if (pieceType === "Pawn") {
         const direction = pieceColor === "white" ? -1 : 1;
@@ -125,8 +115,8 @@ const getValidMoves = (cell, board) => {
 
         // Checks if its the pawn's first move
         if (row === 2 || row === 7) {
-            const oneStepPosition = row + direction * 1;
-            const twoStepsPosition = row + direction * 2;
+            const oneStepPosition = toBoardPosition(row + direction * 1, col);
+            const twoStepsPosition = toBoardPosition(row + direction * 2, col);
 
             console.log(`pushing onestep: ${oneStepPosition}`);
             moves.push(oneStepPosition);
@@ -134,12 +124,14 @@ const getValidMoves = (cell, board) => {
             moves.push(twoStepsPosition);
         } else {
             // its a regular foward pawn move
-            const newPosition = row + direction * 1;
+            const newPosition = toBoardPosition(row + direction * 1, col);
+
             console.log(`pushing regular forward move: ${newPosition}`);
             moves.push(newPosition);
         }
     }
 
+    console.log(`moves before returning are: ${moves}`);
     return moves;
 };
 
@@ -166,7 +158,7 @@ const Board = () => {
         (cell) => {
             console.log(cell);
             setValidMoves(getValidMoves(cell, board));
-            console.log(validMoves);
+            console.log(`valid moves after calling function is ${validMoves}`);
         },
         [selectedPosition, board, validMoves]
     );
