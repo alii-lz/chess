@@ -1,3 +1,28 @@
+import {
+    KingIcon,
+    QueenIcon,
+    BishopIcon,
+    KnightIcon,
+    RookIcon,
+    PawnIcon,
+} from "./Icons.jsx";
+
+// For the drag-n-drop library to only accept items of type "Piece"
+// So we can only drag and drop the chess pieces on the board
+const ItemTypes = {
+    PIECE: "PIECE",
+};
+
+// Maps piece names to their visual components
+const pieceComponents = {
+    Pawn: PawnIcon,
+    Rook: RookIcon,
+    Knight: KnightIcon,
+    Bishop: BishopIcon,
+    Queen: QueenIcon,
+    King: KingIcon,
+};
+
 // Converts position to chess notation
 const toChessNotation = (position: number) => {
     // Converts 0-7 to 1-8
@@ -21,4 +46,10 @@ const getRowColfromBoardPosition = (position) => {
     return { row: zeroBasedRow + 1, col: zeroBasedCol + 1 };
 };
 
-export { toChessNotation, toBoardPosition, getRowColfromBoardPosition };
+export {
+    toChessNotation,
+    toBoardPosition,
+    getRowColfromBoardPosition,
+    ItemTypes,
+    pieceComponents,
+};
