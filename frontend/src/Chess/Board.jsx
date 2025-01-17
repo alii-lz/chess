@@ -9,12 +9,19 @@ import { ItemTypes, pieceComponents } from "./Helpers.tsx";
 const Piece = ({ pieceType, Component, position, color, onDragStart }) => {
     const [, drag] = useDrag({
         type: ItemTypes.PIECE,
-        item: { position, pieceType, color },
-        begin: (item) => {
-            // When piece is picked up, show valid moves
-            onDragStart(item.position);
-            return { position, pieceType, color };
+        item: () => {
+            onDragStart({
+                position,
+                currentPiece: { type: pieceType, color },
+            });
+
+            return {
+                position,
+                pieceType,
+                color,
+            };
         },
+        collect: (monitor) => ({ isDragging: !!monitor.isDragging() }),
     });
 
     return (
@@ -36,10 +43,10 @@ const Square = ({
     const [{ isOver, canDrop }, drop] = useDrop({
         accept: ItemTypes.PIECE /* Only makes items of type {ItemTypes.PIECE} draggable */,
         canDrop: (item) => {
-            return validMoves.includes(item.position);
+            return validMoves.includes(position);
         },
         drop: (item) => {
-            if (validMoves.includes(item.position)) {
+            if (validMoves.includes(position)) {
                 movePiece(item.position, position);
             }
         } /* Handles what happens after you drop the piece */,
@@ -142,8 +149,6 @@ const Board = () => {
 
     const handleSquareClick = React.useCallback(
         (cell) => {
-            console.log(cell);
-
             // currentCellPosition is the cell that's been clicked
             const clickedSquarePosition = cell.position;
 
