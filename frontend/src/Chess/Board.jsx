@@ -10,11 +10,7 @@ const Piece = ({ pieceType, Component, position, color, onDragStart }) => {
     const [, drag] = useDrag({
         type: ItemTypes.PIECE,
         item: () => {
-            onDragStart({
-                position,
-                currentPiece: { type: pieceType, color },
-            });
-
+            onDragStart({ position, currentPiece: { type: pieceType, color } });
             return {
                 position,
                 pieceType,
@@ -22,6 +18,12 @@ const Piece = ({ pieceType, Component, position, color, onDragStart }) => {
             };
         },
         collect: (monitor) => ({ isDragging: !!monitor.isDragging() }),
+        end: (item, monitor) => {
+            if (!monitor.didDrop()) {
+                // Reset valid moves if piece was not dropped on a valid square
+                onDragStart(null);
+            }
+        },
     });
 
     return (
@@ -39,6 +41,7 @@ const Square = ({
     onSquareClick,
     isValidMove,
     validMoves,
+    onDragStart,
 }) => {
     const [{ isOver, canDrop }, drop] = useDrop({
         accept: ItemTypes.PIECE /* Only makes items of type {ItemTypes.PIECE} draggable */,
@@ -48,6 +51,7 @@ const Square = ({
         drop: (item) => {
             if (validMoves.includes(position)) {
                 movePiece(item.position, position);
+                return { moved: true };
             }
         } /* Handles what happens after you drop the piece */,
         collect: (monitor) => ({
@@ -65,7 +69,7 @@ const Square = ({
                 Component={PieceIcon}
                 position={position}
                 color={piece.color}
-                onDragStart={onSquareClick}
+                onDragStart={onDragStart}
             />
         );
     };
@@ -89,7 +93,6 @@ const Square = ({
             className='border flex justify-center items-center w-full h-full'
             style={{
                 background: getBackgroundColor(),
-                // background: cell.color === "white" ? "#cdb081" : "#483624",
                 opacity: isOver ? 0.5 : 1,
                 cursor: hasPiece ? "pointer" : "default",
             }}
@@ -113,6 +116,7 @@ const Board = () => {
     const [validMoves, setValidMoves] = React.useState([]);
     const [selectedPiecePosition, setSelectedPiecePosition] =
         React.useState(null);
+    const [isDragging, setIsDragging] = React.useState(false);
 
     const movePiece = (from, to) => {
         const newBoard = [...board];
@@ -179,8 +183,15 @@ const Board = () => {
 
             // Else we clicked empty cell
         },
-        [board, validMoves]
+        [board, validMoves, selectedPiecePosition]
     );
+
+    const handleDragStart = (item) => {
+        setSelectedPiecePosition(item.position);
+        const cell = board[item.position];
+        const moves = getValidMoves(cell, board);
+        setValidMoves(moves);
+    };
 
     return (
         <DndProvider backend={HTML5Backend}>
@@ -194,6 +205,7 @@ const Board = () => {
                         onSquareClick={handleSquareClick}
                         isValidMove={validMoves.includes(index)}
                         validMoves={validMoves}
+                        onDragStart={handleDragStart}
                     />
                 ))}
             </div>
