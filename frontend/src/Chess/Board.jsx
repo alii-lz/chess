@@ -6,23 +6,16 @@ import { getValidMoves } from "./MoveLogic.jsx";
 import { ItemTypes, pieceComponents } from "./Helpers.tsx";
 
 // Renders a draggable piece
-const Piece = ({ pieceType, Component, position, color, onDragStart }) => {
-    const [, drag] = useDrag({
+const Piece = ({ pieceType, Component, position, color }) => {
+    const [{ isDragging }, drag] = useDrag({
         type: ItemTypes.PIECE,
-        item: () => {
-            onDragStart({ position, currentPiece: { type: pieceType, color } });
-            return {
-                position,
-                pieceType,
-                color,
-            };
-        },
-        collect: (monitor) => ({ isDragging: !!monitor.isDragging() }),
-        end: (item, monitor) => {
-            if (!monitor.didDrop()) {
-                // Reset valid moves if piece was not dropped on a valid square
-                onDragStart(null);
+        collect: (monitor) => {
+            const isDragging = !!monitor.isDragging();
+            if (isDragging) {
+                console.log("item is being dragged");
             }
+
+            return { isDragging };
         },
     });
 
@@ -41,22 +34,16 @@ const Square = ({
     onSquareClick,
     isValidMove,
     validMoves,
-    onDragStart,
 }) => {
-    const [{ isOver, canDrop }, drop] = useDrop({
+    const [{ isOver }, drop] = useDrop({
         accept: ItemTypes.PIECE /* Only makes items of type {ItemTypes.PIECE} draggable */,
-        canDrop: (item) => {
-            return validMoves.includes(position);
-        },
         drop: (item) => {
-            if (validMoves.includes(position)) {
-                movePiece(item.position, position);
-                return { moved: true };
-            }
+            console.log(
+                `item was dropped at position: ${position} and item.position is: ${item.position}`
+            );
         } /* Handles what happens after you drop the piece */,
         collect: (monitor) => ({
             isOver: !!monitor.isOver(),
-            canDrop: !!monitor.canDrop(),
         }),
     });
 
@@ -69,7 +56,6 @@ const Square = ({
                 Component={PieceIcon}
                 position={position}
                 color={piece.color}
-                onDragStart={onDragStart}
             />
         );
     };
@@ -78,12 +64,12 @@ const Square = ({
 
     // Calculate background color based on drag state
     const getBackgroundColor = () => {
-        if (isOver && canDrop) {
-            return "rgba(0, 255, 0, 0.5)"; // Green highlight for valid drop
-        }
-        if (isOver && !canDrop) {
-            return "rgba(255, 0, 0, 0.5)"; // Red highlight for invalid drop
-        }
+        // if (Droppable square) {
+        //     return "rgba(0, 255, 0, 0.5)"; // Green highlight for valid drop
+        // }
+        // if (not Droppable square) {
+        //     return "rgba(255, 0, 0, 0.5)"; // Red highlight for invalid drop
+        // }
         return cell.color === "white" ? "#cdb081" : "#483624";
     };
 
@@ -93,7 +79,7 @@ const Square = ({
             className='border flex justify-center items-center w-full h-full'
             style={{
                 background: getBackgroundColor(),
-                opacity: isOver ? 0.5 : 1,
+                // opacity: isOver ? 0.5 : 1,
                 cursor: hasPiece ? "pointer" : "default",
             }}
             onClick={() => onSquareClick(cell)}
@@ -116,7 +102,6 @@ const Board = () => {
     const [validMoves, setValidMoves] = React.useState([]);
     const [selectedPiecePosition, setSelectedPiecePosition] =
         React.useState(null);
-    const [isDragging, setIsDragging] = React.useState(false);
 
     const movePiece = (from, to) => {
         const newBoard = [...board];
@@ -186,13 +171,6 @@ const Board = () => {
         [board, validMoves, selectedPiecePosition]
     );
 
-    const handleDragStart = (item) => {
-        setSelectedPiecePosition(item.position);
-        const cell = board[item.position];
-        const moves = getValidMoves(cell, board);
-        setValidMoves(moves);
-    };
-
     return (
         <DndProvider backend={HTML5Backend}>
             <div className='grid grid-cols-8 grid-rows-8 w-1/2 h-3/4 border'>
@@ -205,7 +183,6 @@ const Board = () => {
                         onSquareClick={handleSquareClick}
                         isValidMove={validMoves.includes(index)}
                         validMoves={validMoves}
-                        onDragStart={handleDragStart}
                     />
                 ))}
             </div>
