@@ -6,16 +6,29 @@ import { getValidMoves } from "./MoveLogic.jsx";
 import { ItemTypes, pieceComponents } from "./Helpers.tsx";
 
 // Renders a draggable piece
-const Piece = ({ pieceType, Component, position, color }) => {
+const Piece = ({
+    pieceType,
+    Component,
+    position,
+    color,
+    board,
+    setValidMoves,
+}) => {
     const [{ isDragging }, drag] = useDrag({
         type: ItemTypes.PIECE,
-        collect: (monitor) => {
-            const isDragging = !!monitor.isDragging();
-            if (isDragging) {
-                console.log("item is being dragged");
+        item: () => {
+            const piece = board[position].currentPiece;
+            if (piece) {
+                const moves = getValidMoves(board[position], board);
+                setValidMoves(moves);
             }
-
-            return { isDragging };
+            return { position };
+        },
+        collect: (monitor) => ({
+            isDragging: !!monitor.isDragging(),
+        }),
+        end: () => {
+            setValidMoves([]);
         },
     });
 
@@ -33,18 +46,20 @@ const Square = ({
     movePiece,
     onSquareClick,
     isValidMove,
-    validMoves,
+    board,
+    setValidMoves,
 }) => {
     const [{ isOver }, drop] = useDrop({
         accept: ItemTypes.PIECE /* Only makes items of type {ItemTypes.PIECE} draggable */,
         drop: (item) => {
-            console.log(
-                `item was dropped at position: ${position} and item.position is: ${item.position}`
-            );
+            if (isValidMove) {
+                movePiece(item.position, position);
+            }
         } /* Handles what happens after you drop the piece */,
         collect: (monitor) => ({
             isOver: !!monitor.isOver(),
         }),
+        canDrop: () => isValidMove, // Allow dropping only if it's a valid move
     });
 
     const renderPiece = (piece) => {
@@ -56,6 +71,8 @@ const Square = ({
                 Component={PieceIcon}
                 position={position}
                 color={piece.color}
+                board={board}
+                setValidMoves={setValidMoves}
             />
         );
     };
@@ -105,6 +122,11 @@ const Board = () => {
 
     const movePiece = (from, to) => {
         const newBoard = [...board];
+
+        // idk why but this fixes some error
+        if (newBoard[from].currentPiece === undefined) {
+            return;
+        }
 
         const targetPiece = newBoard[from].currentPiece;
         if (targetPiece) {
@@ -183,6 +205,8 @@ const Board = () => {
                         onSquareClick={handleSquareClick}
                         isValidMove={validMoves.includes(index)}
                         validMoves={validMoves}
+                        board={board}
+                        setValidMoves={setValidMoves}
                     />
                 ))}
             </div>
