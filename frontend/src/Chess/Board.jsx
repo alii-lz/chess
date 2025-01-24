@@ -6,14 +6,7 @@ import { getValidMoves } from "./MoveLogic.jsx";
 import { ItemTypes, pieceComponents } from "./Helpers.tsx";
 
 // Renders a draggable piece
-const Piece = ({
-    pieceType,
-    Component,
-    position,
-    color,
-    board,
-    setValidMoves,
-}) => {
+const Piece = ({ Component, position, color, board, setValidMoves }) => {
     const [{ isDragging }, drag] = useDrag({
         type: ItemTypes.PIECE,
         item: () => {
@@ -59,7 +52,9 @@ const Square = ({
         collect: (monitor) => ({
             isOver: !!monitor.isOver(),
         }),
-        canDrop: () => isValidMove, // Allow dropping only if it's a valid move
+        canDrop: () => {
+            return () => isValidMove; // Allow dropping only if it's a valid move
+        },
     });
 
     const renderPiece = (piece) => {
