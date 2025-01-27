@@ -1,5 +1,16 @@
 import { getRowColfromBoardPosition, toBoardPosition } from "./Helpers.tsx";
 
+const isSquareOccupied = (board, row, col) => {
+    // Check if there is a piece on the position (row, col)
+    console.log("hi");
+    const position = toBoardPosition(row, col);
+
+    const hasPiece = board[position].currentPiece;
+
+    // returns true if the square has a piece on it
+    return hasPiece ? true : false;
+};
+
 const getPawnMoves = (pieceColor, moves, row, col) => {
     const direction = pieceColor === "white" ? -1 : 1;
 
@@ -16,16 +27,34 @@ const getPawnMoves = (pieceColor, moves, row, col) => {
 
         moves.push(newPosition);
     }
+
     return moves;
 };
 
-const getRookMoves = (moves, row, col) => {
-    console.log(`row: ${row}, col: ${col}`);
+const getRookMoves = (moves, row, col, board) => {
+    // Add its horizontal moves
+    for (let i = 1; i <= 8; i++) {
+        if (i !== col) {
+            const boardPosition = toBoardPosition(row, i);
 
-    // Given the current position
-    // Check its left and right
-    // so row +- 8
-    // and col +- 8
+            if (!isSquareOccupied(board, row, col)) {
+                // the square does not have a piece, so add it to moves
+                moves.push(boardPosition);
+            }
+        }
+    }
+
+    // Add its vertical moves
+    for (let i = 1; i <= 8; i++) {
+        if (i !== row) {
+            const boardPosition = toBoardPosition(i, col);
+
+            if (!isSquareOccupied(board, row, col)) {
+                // the square does not have a piece, so add it to moves
+                moves.push(boardPosition);
+            }
+        }
+    }
 
     return moves;
 };
@@ -41,8 +70,10 @@ const getValidMoves = (cell, board) => {
     switch (pieceType) {
         case "Pawn":
             moves = getPawnMoves(pieceColor, moves, row, col);
+            break;
         case "Rook":
-            moves = getRookMoves(moves, row, col);
+            moves = getRookMoves(moves, row, col, board);
+            break;
         default:
             break;
     }
