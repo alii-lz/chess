@@ -1,31 +1,32 @@
 import { getRowColfromBoardPosition, toBoardPosition } from "./Helpers.tsx";
 
-const isSquareOccupied = (board, row, col) => {
-    // Check if there is a piece on the position (row, col)
-    console.log("hi");
-    const position = toBoardPosition(row, col);
-
-    const hasPiece = board[position].currentPiece;
-
-    // returns true if the square has a piece on it
-    return hasPiece ? true : false;
+const isSquareOccupied = (board, position) => {
+    const hasPiece = board[position]?.currentPiece?.type;
+    return !!hasPiece;
 };
 
-const getPawnMoves = (pieceColor, moves, row, col) => {
+const getPawnMoves = (pieceColor, moves, row, col, board) => {
     const direction = pieceColor === "white" ? -1 : 1;
+    const oneStepPosition = toBoardPosition(row + direction, col);
 
-    // Checks if its the pawn's first move
-    if (row === 2 || row === 7) {
-        const oneStepPosition = toBoardPosition(row + direction * 1, col);
-        const twoStepsPosition = toBoardPosition(row + direction * 2, col);
-
+    // Check if one-step forward is within bounds and not occupied
+    if (
+        row + direction > 0 &&
+        row + direction < 9 &&
+        !isSquareOccupied(board, oneStepPosition)
+    ) {
         moves.push(oneStepPosition);
-        moves.push(twoStepsPosition);
-    } else {
-        // its a regular foward pawn move
-        const newPosition = toBoardPosition(row + direction * 1, col);
 
-        moves.push(newPosition);
+        // Check if pawn's first move allows for a two-step forward move
+        if (
+            (pieceColor === "white" && row === 7) ||
+            (pieceColor === "black" && row === 2)
+        ) {
+            const twoStepsPosition = toBoardPosition(row + direction * 2, col);
+            if (!isSquareOccupied(board, twoStepsPosition)) {
+                moves.push(twoStepsPosition);
+            }
+        }
     }
 
     return moves;
@@ -36,11 +37,16 @@ const getRookMoves = (moves, row, col, board) => {
     for (let i = 1; i <= 8; i++) {
         if (i !== col) {
             const boardPosition = toBoardPosition(row, i);
+            console.log("I gt here");
 
-            if (!isSquareOccupied(board, row, col)) {
-                // the square does not have a piece, so add it to moves
-                moves.push(boardPosition);
+            console.log(isSquareOccupied(board, boardPosition));
+            if (isSquareOccupied(board, boardPosition)) {
+                // the square has a piece - break because we cannot move to the next squares
+                // since this piece blocks the rook
+                console.log("breaking");
+                break;
             }
+            moves.push(boardPosition);
         }
     }
 
@@ -49,13 +55,16 @@ const getRookMoves = (moves, row, col, board) => {
         if (i !== row) {
             const boardPosition = toBoardPosition(i, col);
 
-            if (!isSquareOccupied(board, row, col)) {
-                // the square does not have a piece, so add it to moves
-                moves.push(boardPosition);
+            if (isSquareOccupied(board, boardPosition)) {
+                // the square has a piece - break because we cannot move to the next squares
+                // since this piece blocks the rook
+                break;
             }
+            moves.push(boardPosition);
         }
     }
 
+    console.log(moves);
     return moves;
 };
 
@@ -69,9 +78,10 @@ const getValidMoves = (cell, board) => {
 
     switch (pieceType) {
         case "Pawn":
-            moves = getPawnMoves(pieceColor, moves, row, col);
+            moves = getPawnMoves(pieceColor, moves, row, col, board);
             break;
         case "Rook":
+            console.log("hi");
             moves = getRookMoves(moves, row, col, board);
             break;
         default:
