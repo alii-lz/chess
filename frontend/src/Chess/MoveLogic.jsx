@@ -33,36 +33,123 @@ const getPawnMoves = (pieceColor, moves, row, col, board) => {
 };
 
 const getRookMoves = (moves, row, col, board) => {
-    // Add its horizontal moves
-    for (let i = 1; i <= 8; i++) {
-        if (i !== col) {
+    /**
+     * We have the position of the rook already.
+     * From this position
+     * 1. Check all rightt
+     * 2. Check all left
+     * 3. Check all up
+     * 4. Check all down
+     */
+
+    console.log(row, col);
+
+    // Check right moves
+    if (col !== 8) {
+        // if we are not at the edge
+        // we can check right moves
+
+        for (let i = col + 1; i <= 8; i++) {
             const boardPosition = toBoardPosition(row, i);
-            console.log("I gt here");
 
-            console.log(isSquareOccupied(board, boardPosition));
             if (isSquareOccupied(board, boardPosition)) {
-                // the square has a piece - break because we cannot move to the next squares
-                // since this piece blocks the rook
-                console.log("breaking");
+                const { curRow, curCol } =
+                    getRowColfromBoardPosition(boardPosition);
+                console.log(`breaking because ${(curRow, curCol)} is occupied`);
                 break;
             }
+
             moves.push(boardPosition);
         }
     }
 
-    // Add its vertical moves
-    for (let i = 1; i <= 8; i++) {
-        if (i !== row) {
-            const boardPosition = toBoardPosition(i, col);
+    // Check left moves
+    if (col !== 1) {
+        // if we are not at the edge
+        // we can check left moves
+
+        for (let i = col - 1; i >= 1; i--) {
+            const boardPosition = toBoardPosition(row, i);
 
             if (isSquareOccupied(board, boardPosition)) {
-                // the square has a piece - break because we cannot move to the next squares
-                // since this piece blocks the rook
+                const { curRow, curCol } =
+                    getRowColfromBoardPosition(boardPosition);
+                console.log(`breaking because ${(curRow, curCol)} is occupied`);
                 break;
             }
+
             moves.push(boardPosition);
         }
     }
+
+    // Check up moves
+    if (row !== 1) {
+        // if we are not at the edge
+        // we can check up moves
+
+        for (let i = row - 1; i >= 1; i--) {
+            console.log(`current row is ${i}`);
+            const boardPosition = toBoardPosition(row, i);
+            if (isSquareOccupied(board, boardPosition)) {
+                const { curRow, curCol } =
+                    getRowColfromBoardPosition(boardPosition);
+                console.log(`breaking because ${(curRow, curCol)} is occupied`);
+                break;
+            }
+
+            moves.push(boardPosition);
+        }
+    }
+
+    // Check down moves
+    if (row !== 8) {
+        // if we are not at the edge
+        // we can check down moves
+
+        for (let i = row + 1; i <= 8; i++) {
+            const boardPosition = toBoardPosition(row, i);
+
+            if (isSquareOccupied(board, boardPosition)) {
+                const { curRow, curCol } =
+                    getRowColfromBoardPosition(boardPosition);
+                console.log(`breaking because ${(curRow, curCol)} is occupied`);
+                break;
+            }
+
+            moves.push(boardPosition);
+        }
+    }
+
+    // Add its horizontal moves
+    // for (let i = 1; i <= 8; i++) {
+    //     if (i !== col) {
+    //         const boardPosition = toBoardPosition(row, i);
+
+    //         console.log(isSquareOccupied(board, boardPosition));
+    //         if (isSquareOccupied(board, boardPosition)) {
+    //             // the square has a piece - break because we cannot move to the next squares
+    //             // since this piece blocks the rook
+    //             continue;
+    //         }
+    //         moves.push(boardPosition);
+    //     }
+    // }
+
+    // // Add its vertical moves
+    // console.log("entering the vertical moves for loop");
+    // for (let i = 1; i <= 8; i++) {
+    //     console.log(`current i is at row: ${i}`);
+    //     if (i !== row) {
+    //         const boardPosition = toBoardPosition(i, col);
+
+    //         if (isSquareOccupied(board, boardPosition)) {
+    //             // the square has a piece - break because we cannot move to the next squares
+    //             // since this piece blocks the rook
+    //             continue;
+    //         }
+    //         moves.push(boardPosition);
+    //     }
+    // }
 
     console.log(moves);
     return moves;
@@ -81,7 +168,6 @@ const getValidMoves = (cell, board) => {
             moves = getPawnMoves(pieceColor, moves, row, col, board);
             break;
         case "Rook":
-            console.log("hi");
             moves = getRookMoves(moves, row, col, board);
             break;
         default:
