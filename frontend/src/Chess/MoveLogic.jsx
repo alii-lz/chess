@@ -58,7 +58,26 @@ const getRookMoves = (moves, row, col, board) => {
     return moves;
 };
 
-const getKnightMoves = (moves, board, row, col) => {};
+const getKnightMoves = (moves, board, row, col) => {
+    /*
+        
+        At any position - the knight can make 8 valid moves
+        4 moves to its left side
+        Given (row, col)
+
+        1. (row - 1, col - 2)
+        2. (row - 2, col - 1)
+        3. (row + 1, col - 2)
+        4. (row + 2, col - 1)
+    
+        4 moves to its right side 
+
+        1. (row - 1, col + 2)
+        2. (row - 2, col + 1)
+        3. (row + 1, col + 2)
+        4. (row + 2, col + 1)
+     */
+};
 
 const getValidMoves = (cell, board) => {
     const pieceType = cell.currentPiece.type;
