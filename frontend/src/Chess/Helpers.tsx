@@ -33,7 +33,7 @@ const toChessNotation = (position: number) => {
 };
 
 // Converts row and col to the relevant position on the board. Returns (0-63)
-const toBoardPosition = (row, col) => {
+const getBoardPositionFromRowCol = (row, col) => {
     return (row - 1) * 8 + (col - 1);
 };
 
@@ -46,7 +46,7 @@ const getRowColfromBoardPosition = (position: number) => {
 
 export {
     toChessNotation,
-    toBoardPosition,
+    getBoardPositionFromRowCol,
     getRowColfromBoardPosition,
     ItemTypes,
     pieceComponents,
