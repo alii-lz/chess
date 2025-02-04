@@ -1,4 +1,7 @@
-import { getRowColfromBoardPosition, toBoardPosition } from "./Helpers.tsx";
+import {
+    getRowColfromBoardPosition,
+    getBoardPositionFromRowCol,
+} from "./Helpers.tsx";
 
 const isSquareOccupied = (board, position) => {
     const hasPiece = board[position]?.currentPiece?.type;
@@ -7,7 +10,7 @@ const isSquareOccupied = (board, position) => {
 
 const getPawnMoves = (pieceColor, moves, row, col, board) => {
     const direction = pieceColor === "white" ? -1 : 1;
-    const oneStepPosition = toBoardPosition(row + direction, col);
+    const oneStepPosition = getBoardPositionFromRowCol(row + direction, col);
 
     // Check if one-step forward is within bounds and not occupied
     if (
@@ -22,7 +25,10 @@ const getPawnMoves = (pieceColor, moves, row, col, board) => {
             (pieceColor === "white" && row === 7) ||
             (pieceColor === "black" && row === 2)
         ) {
-            const twoStepsPosition = toBoardPosition(row + direction * 2, col);
+            const twoStepsPosition = getBoardPositionFromRowCol(
+                row + direction * 2,
+                col
+            );
             if (!isSquareOccupied(board, twoStepsPosition)) {
                 moves.push(twoStepsPosition);
             }
@@ -38,7 +44,7 @@ const getRookMoves = (moves, row, col, board) => {
         let c = col + colIncrement;
 
         while (r >= 1 && r <= 8 && c >= 1 && c <= 8) {
-            const boardPosition = toBoardPosition(r, c);
+            const boardPosition = getBoardPositionFromRowCol(r, c);
 
             if (isSquareOccupied(board, boardPosition)) {
                 break;
@@ -77,6 +83,34 @@ const getKnightMoves = (moves, board, row, col) => {
         3. (row + 1, col + 2)
         4. (row + 2, col + 1)
      */
+
+    const positions = [];
+
+    const p1 = getBoardPositionFromRowCol(row - 1, col - 2);
+    const p2 = getBoardPositionFromRowCol(row - 2, col - 1);
+    const p3 = getBoardPositionFromRowCol(row + 1, col - 2);
+    const p4 = getBoardPositionFromRowCol(row + 2, col - 1);
+
+    const p5 = getBoardPositionFromRowCol(row - 1, col + 2);
+    const p6 = getBoardPositionFromRowCol(row - 2, col + 1);
+    const p7 = getBoardPositionFromRowCol(row + 1, col + 2);
+    const p8 = getBoardPositionFromRowCol(row + 2, col + 1);
+
+    positions.push(p1);
+    positions.push(p2);
+    positions.push(p3);
+    positions.push(p4);
+    positions.push(p5);
+    positions.push(p6);
+    positions.push(p7);
+    positions.push(p8);
+
+    for (const position of positions) {
+        console.log(position);
+        if (position >= 0 && position <= 63) {
+            moves.push(position);
+        }
+    }
 };
 
 const getValidMoves = (cell, board) => {
