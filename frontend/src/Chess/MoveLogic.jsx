@@ -64,7 +64,7 @@ const getRookMoves = (moves, row, col, board) => {
     return moves;
 };
 
-const getKnightMoves = (moves, board, row, col) => {
+const getKnightMoves = (moves, row, col, board) => {
     /*
         
         At any position - the knight can make 8 valid moves
@@ -84,33 +84,32 @@ const getKnightMoves = (moves, board, row, col) => {
         4. (row + 2, col + 1)
      */
 
-    const positions = [];
+    const potentialMoves = [
+        { r: row - 1, c: col - 2 },
+        { r: row - 2, c: col - 1 },
+        { r: row + 1, c: col - 2 },
+        { r: row + 2, c: col - 1 },
+        { r: row - 1, c: col + 2 },
+        { r: row - 2, c: col + 1 },
+        { r: row + 1, c: col + 2 },
+        { r: row + 2, c: col + 1 },
+    ];
 
-    const p1 = getBoardPositionFromRowCol(row - 1, col - 2);
-    const p2 = getBoardPositionFromRowCol(row - 2, col - 1);
-    const p3 = getBoardPositionFromRowCol(row + 1, col - 2);
-    const p4 = getBoardPositionFromRowCol(row + 2, col - 1);
-
-    const p5 = getBoardPositionFromRowCol(row - 1, col + 2);
-    const p6 = getBoardPositionFromRowCol(row - 2, col + 1);
-    const p7 = getBoardPositionFromRowCol(row + 1, col + 2);
-    const p8 = getBoardPositionFromRowCol(row + 2, col + 1);
-
-    positions.push(p1);
-    positions.push(p2);
-    positions.push(p3);
-    positions.push(p4);
-    positions.push(p5);
-    positions.push(p6);
-    positions.push(p7);
-    positions.push(p8);
-
-    for (const position of positions) {
-        console.log(position);
-        if (position >= 0 && position <= 63) {
+    for (const move of potentialMoves) {
+        const position = getBoardPositionFromRowCol(move.r, move.c);
+        if (
+            move.r > 0 &&
+            move.r <= 8 &&
+            move.c > 0 &&
+            move.c <= 8 &&
+            position >= 0 &&
+            position < 64
+        ) {
             moves.push(position);
         }
     }
+
+    return moves;
 };
 
 const getValidMoves = (cell, board) => {
@@ -127,6 +126,9 @@ const getValidMoves = (cell, board) => {
             break;
         case "Rook":
             moves = getRookMoves(moves, row, col, board);
+            break;
+        case "Knight":
+            moves = getKnightMoves(moves, row, col, board);
             break;
         default:
             break;
