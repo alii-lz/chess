@@ -2,13 +2,20 @@ import {
     getRowColfromBoardPosition,
     getBoardPositionFromRowCol,
 } from "./Helpers.tsx";
+import { Cell } from "../Types/Cell.ts";
 
 const isSquareOccupied = (board, position) => {
     const hasPiece = board[position]?.currentPiece?.type;
     return !!hasPiece;
 };
 
-const getPawnMoves = (pieceColor, moves, row, col, board) => {
+const getPawnMoves = (
+    pieceColor: string,
+    moves: number[],
+    row: number,
+    col: number,
+    board: Cell[]
+) => {
     const direction = pieceColor === "white" ? -1 : 1;
     const oneStepPosition = getBoardPositionFromRowCol(row + direction, col);
 
@@ -38,7 +45,12 @@ const getPawnMoves = (pieceColor, moves, row, col, board) => {
     return moves;
 };
 
-const getRookMoves = (moves, row, col, board) => {
+const getRookMoves = (
+    moves: number[],
+    row: number,
+    col: number,
+    board: Cell[]
+) => {
     const calculateMovesForDirection = (rowIncrement, colIncrement) => {
         let r = row + rowIncrement;
         let c = col + colIncrement;
@@ -64,7 +76,12 @@ const getRookMoves = (moves, row, col, board) => {
     return moves;
 };
 
-const getKnightMoves = (moves, row, col, board) => {
+const getKnightMoves = (
+    moves: number[],
+    row: number,
+    col: number,
+    board: Cell[]
+) => {
     const potentialMoves = [
         { r: row - 1, c: col - 2 },
         { r: row - 2, c: col - 1 },
@@ -93,7 +110,12 @@ const getKnightMoves = (moves, row, col, board) => {
     return moves;
 };
 
-const getBishopMoves = (moves, row, col, board) => {
+const getBishopMoves = (
+    moves: number[],
+    row: number,
+    col: number,
+    board: Cell[]
+) => {
     /*
         From current position
         We can either move:
@@ -114,7 +136,10 @@ const getBishopMoves = (moves, row, col, board) => {
 
     */
 
-    const calculateMovesForDirection = (rowIncrement, colIncrement) => {
+    const calculateMovesForDirection = (
+        rowIncrement: number,
+        colIncrement: number
+    ) => {
         let curRow = row;
         let curCol = col;
 
@@ -149,13 +174,25 @@ const getBishopMoves = (moves, row, col, board) => {
     return moves;
 };
 
-const getValidMoves = (cell, board) => {
+const getQueenMoves = (
+    moves: number[],
+    row: number,
+    col: number,
+    board: Cell[]
+) => {
+    getRookMoves(moves, row, col, board);
+    getBishopMoves(moves, row, col, board);
+
+    return moves;
+};
+
+const getValidMoves = (cell: Cell, board: Cell[]) => {
     const pieceType = cell.currentPiece.type;
     const pieceColor = cell.currentPiece.color;
     const position = cell.position;
 
     const { row, col } = getRowColfromBoardPosition(position);
-    let moves = [];
+    let moves: number[] = [];
 
     switch (pieceType) {
         case "Pawn":
@@ -169,6 +206,9 @@ const getValidMoves = (cell, board) => {
             break;
         case "Bishop":
             moves = getBishopMoves(moves, row, col, board);
+            break;
+        case "Queen":
+            moves = getQueenMoves(moves, row, col, board);
             break;
         default:
             break;

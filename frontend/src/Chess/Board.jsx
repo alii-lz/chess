@@ -2,7 +2,7 @@ import React from "react";
 import { boardInit } from "./InitializeBoard.tsx";
 import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { getValidMoves } from "./MoveLogic.jsx";
+import { getValidMoves } from "./MoveLogic.tsx";
 import { ItemTypes, pieceComponents } from "./Helpers.tsx";
 
 // Renders a draggable piece
