@@ -116,26 +116,6 @@ const getBishopMoves = (
     col: number,
     board: Cell[]
 ) => {
-    /*
-        From current position
-        We can either move:
-        
-        1. top right
-            row - 1, col + 1
-
-        2. bottom right
-            row + 1, col + 1
-
-        3. top left
-            row - 1, col - 1
-
-        4. bottom left
-            row + 1, col - 1
-            
-        Loop condition: Continue looping until we reach row = 8 or col = 8
-
-    */
-
     const calculateMovesForDirection = (
         rowIncrement: number,
         colIncrement: number
@@ -186,6 +166,41 @@ const getQueenMoves = (
     return moves;
 };
 
+const getKingMoves = (
+    moves: number[],
+    row: number,
+    col: number,
+    board: Cell[]
+) => {
+    const potentialMoves = [
+        { r: row - 1, c: col },
+        { r: row + 1, c: col },
+        { r: row, c: col + 1 },
+        { r: row, c: col - 1 },
+        { r: row + 1, c: col + 1 },
+        { r: row + 1, c: col - 1 },
+        { r: row - 1, c: col + 1 },
+        { r: row - 1, c: col - 1 },
+    ];
+
+    for (const move of potentialMoves) {
+        const nextPosition = getBoardPositionFromRowCol(move.r, move.c);
+        if (
+            move.r > 0 &&
+            move.r <= 8 &&
+            move.c > 0 &&
+            move.c <= 8 &&
+            nextPosition >= 0 &&
+            nextPosition < 64 &&
+            !isSquareOccupied(board, nextPosition)
+        ) {
+            moves.push(nextPosition);
+        }
+    }
+
+    return moves;
+};
+
 const getValidMoves = (cell: Cell, board: Cell[]) => {
     const pieceType = cell.currentPiece.type;
     const pieceColor = cell.currentPiece.color;
@@ -209,6 +224,9 @@ const getValidMoves = (cell: Cell, board: Cell[]) => {
             break;
         case "Queen":
             moves = getQueenMoves(moves, row, col, board);
+            break;
+        case "King":
+            moves = getKingMoves(moves, row, col, board);
             break;
         default:
             break;
