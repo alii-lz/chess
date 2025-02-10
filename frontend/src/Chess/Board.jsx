@@ -4,6 +4,8 @@ import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { getValidMoves } from "./MoveLogic.tsx";
 import { ItemTypes, pieceComponents } from "./Helpers.tsx";
+import { useDispatch, useSelector } from "react-redux";
+import { swapTurn } from "../State/TurnSlice.ts";
 
 // Renders a draggable piece
 const Piece = ({ Component, position, color, board, setValidMoves }) => {
@@ -109,6 +111,9 @@ const Square = ({
 };
 
 const Board = () => {
+    const whiteTurn = useSelector((state) => state.turn.whiteTurn);
+    const dispatch = useDispatch();
+
     const chessBoard = boardInit();
     const [board, setBoard] = React.useState(chessBoard);
     const [validMoves, setValidMoves] = React.useState([]);
@@ -150,13 +155,39 @@ const Board = () => {
                 1. Initial board render - a function reference is created
                 2. On subsequent renders - function reference remains same unless dependency array
                 changes  
-    
-    */
+                
+                */
 
     const handleSquareClick = React.useCallback(
         (cell) => {
+            console.log(`current value of whiteTurn is ${whiteTurn}`);
+            console.log(`current cell info is:`);
+            console.log(cell.currentPiece);
+
             // currentCellPosition is the cell that's been clicked
             const clickedSquarePosition = cell.position;
+
+            // If we click the same cell or an empty cell
+            //  hide moves && unselect the cell
+            if (
+                selectedPiecePosition === clickedSquarePosition ||
+                cell.currentPiece === null
+            ) {
+                setValidMoves([]);
+                setSelectedPiecePosition(null);
+                return;
+            }
+
+            if (
+                whiteTurn &&
+                cell.currentPiece.type &&
+                cell?.currentPiece.color !== "white"
+            ) {
+                console.log(
+                    "returning because its not the selected piece's color's turn"
+                );
+                return;
+            }
 
             // Moves piece to another cell if that cell is part of the piece's
             // valid moves
@@ -166,18 +197,12 @@ const Board = () => {
             ) {
                 movePiece(selectedPiecePosition, clickedSquarePosition);
                 setSelectedPiecePosition(null);
-                return;
-            }
-
-            // If we click the same cell - hide its moves && unselect the cell
-            if (selectedPiecePosition === clickedSquarePosition) {
-                setValidMoves([]);
-                setSelectedPiecePosition(null);
+                dispatch(swapTurn());
                 return;
             }
 
             // If we clicked a piece - show its validMoves && select that cell
-            if (cell.currentPiece) {
+            if (cell.currentPiece.type) {
                 const moves = getValidMoves(cell, board);
                 setValidMoves(moves);
                 setSelectedPiecePosition(clickedSquarePosition);
@@ -185,7 +210,7 @@ const Board = () => {
 
             // Else we clicked empty cell
         },
-        [board, validMoves, selectedPiecePosition]
+        [board, validMoves, selectedPiecePosition, whiteTurn, dispatch]
     );
 
     return (

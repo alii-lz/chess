@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-// import type { PayloadAction } from "@reduxjs/toolkit";
 
 export interface TurnState {
     whiteTurn: boolean;
@@ -14,11 +13,7 @@ export const turnSlice = createSlice({
     initialState,
     reducers: {
         swapTurn: (state) => {
-            if (state.whiteTurn) {
-                state.whiteTurn = false;
-            } else {
-                state.whiteTurn = true;
-            }
+            state.whiteTurn = !state.whiteTurn;
         },
     },
 });

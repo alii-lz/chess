@@ -1,7 +1,7 @@
 import "./index.css";
 import Navbar from "./Components/Navbar.jsx";
 import Board from "./Chess/Board.jsx";
-import { store } from "./State/Store.js";
+import { store } from "./State/Store.ts";
 import { Provider } from "react-redux";
 
 function App() {
