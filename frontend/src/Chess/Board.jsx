@@ -160,10 +160,6 @@ const Board = () => {
 
     const handleSquareClick = React.useCallback(
         (cell) => {
-            console.log(`current value of whiteTurn is ${whiteTurn}`);
-            console.log(`current cell info is:`);
-            console.log(cell.currentPiece);
-
             // currentCellPosition is the cell that's been clicked
             const clickedSquarePosition = cell.position;
 
@@ -178,23 +174,21 @@ const Board = () => {
                 return;
             }
 
-            if (
-                whiteTurn &&
-                cell.currentPiece.type &&
-                cell?.currentPiece.color !== "white"
-            ) {
-                console.log(
-                    "returning because its not the selected piece's color's turn"
-                );
+            const isOpponentTurn = whiteTurn
+                ? cell.currentPiece?.color !== "white"
+                : cell.currentPiece?.color !== "black";
+
+            if (cell.currentPiece.type && isOpponentTurn) {
+                console.log("returning because its the opponents's turn");
                 return;
             }
 
-            // Moves piece to another cell if that cell is part of the piece's
-            // valid moves
             if (
                 validMoves.length &&
                 validMoves.includes(clickedSquarePosition)
             ) {
+                // Moves piece to another cell if that cell is part of the piece's
+                // valid moves
                 movePiece(selectedPiecePosition, clickedSquarePosition);
                 setSelectedPiecePosition(null);
                 dispatch(swapTurn());
