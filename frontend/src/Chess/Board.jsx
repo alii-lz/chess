@@ -160,10 +160,6 @@ const Board = () => {
 
     const handleSquareClick = React.useCallback(
         (cell) => {
-            // console.log(`current value of whiteTurn is ${whiteTurn}`);
-            // console.log(`current cell info is:`);
-            // console.log(cell.currentPiece);
-
             // currentCellPosition is the cell that's been clicked
             const clickedSquarePosition = cell.position;
 
