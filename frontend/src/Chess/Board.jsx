@@ -76,14 +76,7 @@ const Square = ({
 
     const hasPiece = cell.currentPiece && cell.currentPiece.type;
 
-    // Calculate background color based on drag state
     const getBackgroundColor = () => {
-        // if (Droppable square) {
-        //     return "rgba(0, 255, 0, 0.5)"; // Green highlight for valid drop
-        // }
-        // if (not Droppable square) {
-        //     return "rgba(255, 0, 0, 0.5)"; // Red highlight for invalid drop
-        // }
         return cell.color === "white" ? "#cdb081" : "#483624";
     };
 
