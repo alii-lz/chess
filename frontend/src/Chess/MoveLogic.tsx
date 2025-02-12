@@ -3,10 +3,19 @@ import {
     getBoardPositionFromRowCol,
 } from "./Helpers.tsx";
 import { Cell } from "../Types/Cell.ts";
+import { current } from "@reduxjs/toolkit";
 
-const isSquareOccupied = (board, position) => {
+const isSquareOccupied = (board: Cell[], position: number) => {
     const hasPiece = board[position]?.currentPiece?.type;
     return !!hasPiece;
+};
+
+const isSquareCapturable = (board: Cell[], position: number) => {
+    /*
+
+
+
+    */
 };
 
 const getPawnMoves = (
@@ -82,6 +91,12 @@ const getKnightMoves = (
     col: number,
     board: Cell[]
 ) => {
+    const currentKnightPosition = getBoardPositionFromRowCol(row, col);
+
+    const currentKnightPiece = board[currentKnightPosition];
+
+    const pieceColor = currentKnightPiece.currentPiece.color;
+
     const potentialMoves = [
         { r: row - 1, c: col - 2 },
         { r: row - 2, c: col - 1 },
@@ -95,6 +110,7 @@ const getKnightMoves = (
 
     for (const move of potentialMoves) {
         const nextPosition = getBoardPositionFromRowCol(move.r, move.c);
+
         if (
             move.r > 0 &&
             move.r <= 8 &&
@@ -103,6 +119,8 @@ const getKnightMoves = (
             nextPosition >= 0 &&
             nextPosition < 64
         ) {
+            // if ()
+
             moves.push(nextPosition);
         }
     }
