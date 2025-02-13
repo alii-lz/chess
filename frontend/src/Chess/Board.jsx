@@ -172,7 +172,6 @@ const Board = () => {
                 : cell.currentPiece?.color !== "black";
 
             if (cell.currentPiece.type && isOpponentTurn) {
-                console.log("returning because its the opponents's turn");
                 return;
             }
 

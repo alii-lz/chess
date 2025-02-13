@@ -3,19 +3,42 @@ import {
     getBoardPositionFromRowCol,
 } from "./Helpers.tsx";
 import { Cell } from "../Types/Cell.ts";
-import { current } from "@reduxjs/toolkit";
 
 const isSquareOccupied = (board: Cell[], position: number) => {
-    const hasPiece = board[position]?.currentPiece?.type;
-    return !!hasPiece;
+    if (board[position].currentPiece === null) {
+        return false;
+    } else {
+        if (board[position].currentPiece.type === "") {
+            return false;
+        }
+
+        return true;
+    }
 };
 
-const isSquareCapturable = (board: Cell[], position: number) => {
+const canKnightCapture = (
+    board: Cell[],
+    position: number,
+    attackingPieceColor: string
+) => {
     /*
-
-
-
+        1. Get the color of the piece on ${position}
+        2. If attackingPieceColor != color: return true else false
     */
+
+    const squareToCapture = board[position];
+
+    if (squareToCapture.currentPiece === null) {
+        return true;
+    } else {
+        if (squareToCapture.currentPiece.type === "") {
+            return true;
+        }
+
+        const colorOfCapturablePiece = squareToCapture.currentPiece.color;
+
+        return attackingPieceColor !== colorOfCapturablePiece;
+    }
 };
 
 const getPawnMoves = (
@@ -91,11 +114,20 @@ const getKnightMoves = (
     col: number,
     board: Cell[]
 ) => {
-    const currentKnightPosition = getBoardPositionFromRowCol(row, col);
+    /*
+        Case 1: nextPosition is a white piece.
+            do not add it to the moves
 
-    const currentKnightPiece = board[currentKnightPosition];
+        Case 2: nextPosition is a black piece
+            add it to the moves
 
-    const pieceColor = currentKnightPiece.currentPiece.color;
+    */
+
+    const knightPosition = getBoardPositionFromRowCol(row, col);
+
+    const knightPiece = board[knightPosition];
+
+    const knightColor = knightPiece.currentPiece.color;
 
     const potentialMoves = [
         { r: row - 1, c: col - 2 },
@@ -119,9 +151,9 @@ const getKnightMoves = (
             nextPosition >= 0 &&
             nextPosition < 64
         ) {
-            // if ()
-
-            moves.push(nextPosition);
+            if (canKnightCapture(board, nextPosition, knightColor)) {
+                moves.push(nextPosition);
+            }
         }
     }
 
