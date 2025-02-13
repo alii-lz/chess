@@ -13,11 +13,6 @@ export const turnSlice = createSlice({
     initialState,
     reducers: {
         swapTurn: (state) => {
-            console.log(
-                `updating whiteTurn state from ${
-                    state.whiteTurn
-                } to ${!state.whiteTurn}`
-            );
             state.whiteTurn = !state.whiteTurn;
         },
     },
