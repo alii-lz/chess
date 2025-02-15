@@ -13,7 +13,10 @@ const Piece = ({ Component, position, color, board, setValidMoves }) => {
         type: ItemTypes.PIECE,
         item: () => {
             const piece = board[position].currentPiece;
-            if (piece) {
+            if (
+                piece &&
+                piece.color === (color === "white" ? "white" : "black")
+            ) {
                 const moves = getValidMoves(board[position], board);
                 setValidMoves(moves);
             }
@@ -44,11 +47,19 @@ const Square = ({
     board,
     setValidMoves,
 }) => {
+    const whiteTurn = useSelector((state) => state.turn.whiteTurn);
+
     const [{ isOver }, drop] = useDrop({
         accept: ItemTypes.PIECE /* Only makes items of type {ItemTypes.PIECE} draggable */,
         drop: (item) => {
             if (isValidMove) {
-                movePiece(item.position, position);
+                const fromCell = board[item.position];
+                const isCorrectTurn =
+                    (whiteTurn && fromCell.currentPiece?.color === "white") ||
+                    (!whiteTurn && fromCell.currentPiece?.color === "black");
+                if (isCorrectTurn) {
+                    movePiece(item.position, position);
+                }
             }
         } /* Handles what happens after you drop the piece */,
         collect: (monitor) => ({
@@ -115,19 +126,21 @@ const Board = () => {
 
     const movePiece = (from, to) => {
         const newBoard = [...board];
-
-        // idk why but this fixes some error
-        if (newBoard[from].currentPiece === undefined) {
-            return;
-        }
-
         const targetPiece = newBoard[from].currentPiece;
-        if (targetPiece) {
-            newBoard[from].currentPiece = null;
-            newBoard[to].currentPiece = targetPiece;
-            setValidMoves([]);
-            setBoard(newBoard);
-        }
+
+        if (!targetPiece) return;
+
+        const isCorrectTurn =
+            (whiteTurn && targetPiece.color === "white") ||
+            (!whiteTurn && targetPiece.color === "black");
+
+        if (!isCorrectTurn) return;
+
+        newBoard[to].currentPiece = targetPiece;
+        newBoard[from].currentPiece = null;
+        setBoard(newBoard);
+        setValidMoves([]);
+        dispatch(swapTurn());
     };
 
     /*  useCallback ensures the function reference for ${handleSquareClick} remains the same
@@ -149,54 +162,58 @@ const Board = () => {
                 2. On subsequent renders - function reference remains same unless dependency array
                 changes  
                 
-                */
+    */
 
     const handleSquareClick = React.useCallback(
         (cell) => {
-            // currentCellPosition is the cell that's been clicked
-            const clickedSquarePosition = cell.position;
+            const clickedPosition = cell.position;
+            const clickedPiece = cell.currentPiece;
 
-            // If we click the same cell or an empty cell
-            //  hide moves && unselect the cell
+            // If clicking the same square or an empty square when no piece is selected
             if (
-                selectedPiecePosition === clickedSquarePosition ||
-                cell.currentPiece === null
+                selectedPiecePosition === clickedPosition ||
+                (!clickedPiece && !selectedPiecePosition)
             ) {
                 setValidMoves([]);
                 setSelectedPiecePosition(null);
                 return;
             }
 
-            const isOpponentTurn = whiteTurn
-                ? cell.currentPiece?.color !== "white"
-                : cell.currentPiece?.color !== "black";
-
-            if (cell.currentPiece.type && isOpponentTurn) {
-                return;
-            }
-
+            // If a piece is selected and clicking a valid move square
             if (
-                validMoves.length &&
-                validMoves.includes(clickedSquarePosition)
+                selectedPiecePosition !== null &&
+                validMoves.includes(clickedPosition)
             ) {
-                // Moves piece to another cell if that cell is part of the piece's
-                // valid moves
-                movePiece(selectedPiecePosition, clickedSquarePosition);
+                movePiece(selectedPiecePosition, clickedPosition);
                 setSelectedPiecePosition(null);
-                dispatch(swapTurn());
                 return;
             }
 
-            // If we clicked a piece - show its validMoves && select that cell
-            if (cell.currentPiece.type) {
+            // If clicking a new piece
+            if (clickedPiece) {
+                const isCorrectTurn =
+                    (whiteTurn && clickedPiece.color === "white") ||
+                    (!whiteTurn && clickedPiece.color === "black");
+
+                if (!isCorrectTurn) {
+                    setValidMoves([]);
+                    setSelectedPiecePosition(null);
+                    return;
+                }
+
                 const moves = getValidMoves(cell, board);
                 setValidMoves(moves);
-                setSelectedPiecePosition(clickedSquarePosition);
+                setSelectedPiecePosition(clickedPosition);
             }
-
-            // Else we clicked empty cell
         },
-        [board, validMoves, selectedPiecePosition, whiteTurn, dispatch]
+        [
+            board,
+            validMoves,
+            selectedPiecePosition,
+            whiteTurn,
+            dispatch,
+            movePiece,
+        ]
     );
 
     return (

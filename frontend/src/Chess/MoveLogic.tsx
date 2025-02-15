@@ -4,41 +4,30 @@ import {
 } from "./Helpers.tsx";
 import { Cell } from "../Types/Cell.ts";
 
-const isSquareOccupied = (board: Cell[], position: number) => {
-    if (board[position].currentPiece === null) {
-        return false;
-    } else {
-        if (board[position].currentPiece.type === "") {
-            return false;
-        }
+const isSquareOccupied = (
+    board: Cell[],
+    position: number,
+    attackingPieceColor = null
+) => {
+    const piece = board[position].currentPiece;
+    if (!piece || !piece.type) return false;
 
-        return true;
+    // If we're checking for capture possibility
+    if (attackingPieceColor !== null) {
+        return piece.color === attackingPieceColor;
     }
+
+    return true;
 };
 
-const canKnightCapture = (
+const canMoveTo = (
     board: Cell[],
     position: number,
     attackingPieceColor: string
 ) => {
-    /*
-        1. Get the color of the piece on ${position}
-        2. If attackingPieceColor != color: return true else false
-    */
-
-    const squareToCapture = board[position];
-
-    if (squareToCapture.currentPiece === null) {
-        return true;
-    } else {
-        if (squareToCapture.currentPiece.type === "") {
-            return true;
-        }
-
-        const colorOfCapturablePiece = squareToCapture.currentPiece.color;
-
-        return attackingPieceColor !== colorOfCapturablePiece;
-    }
+    const targetSquare = board[position];
+    if (!targetSquare.currentPiece) return true;
+    return targetSquare.currentPiece.color !== attackingPieceColor;
 };
 
 const getPawnMoves = (
@@ -86,14 +75,17 @@ const getRookMoves = (
     const calculateMovesForDirection = (rowIncrement, colIncrement) => {
         let r = row + rowIncrement;
         let c = col + colIncrement;
+        const rookPosition = getBoardPositionFromRowCol(row, col);
+        const rookColor = board[rookPosition].currentPiece.color;
 
         while (r >= 1 && r <= 8 && c >= 1 && c <= 8) {
             const nextPosition = getBoardPositionFromRowCol(r, c);
 
-            if (isSquareOccupied(board, nextPosition)) {
-                break;
-            }
+            if (!canMoveTo(board, nextPosition, rookColor)) break;
             moves.push(nextPosition);
+
+            // Stop after capturing
+            if (board[nextPosition].currentPiece) break;
 
             r += rowIncrement;
             c += colIncrement;
@@ -151,9 +143,9 @@ const getKnightMoves = (
             nextPosition >= 0 &&
             nextPosition < 64
         ) {
-            if (canKnightCapture(board, nextPosition, knightColor)) {
-                moves.push(nextPosition);
-            }
+            // if (canKnightCapture(board, nextPosition, knightColor)) {
+            moves.push(nextPosition);
+            // }
         }
     }
 
