@@ -1,6 +1,7 @@
 import {
     getRowColfromBoardPosition,
     getBoardPositionFromRowCol,
+    getChessNotationFromPosition,
 } from "./Helpers.tsx";
 import { Cell } from "../Types/Cell.ts";
 
@@ -26,7 +27,10 @@ const canMoveTo = (
     attackingPieceColor: string
 ) => {
     const targetSquare = board[position];
-    if (!targetSquare.currentPiece) return true;
+    if (!targetSquare.currentPiece || targetSquare.currentPiece.type === "") {
+        return true;
+    }
+
     return targetSquare.currentPiece.color !== attackingPieceColor;
 };
 
@@ -72,7 +76,10 @@ const getRookMoves = (
     col: number,
     board: Cell[]
 ) => {
-    const calculateMovesForDirection = (rowIncrement, colIncrement) => {
+    const calculateMovesForDirection = (
+        rowIncrement: number,
+        colIncrement: number
+    ) => {
         let r = row + rowIncrement;
         let c = col + colIncrement;
         const rookPosition = getBoardPositionFromRowCol(row, col);
@@ -81,11 +88,18 @@ const getRookMoves = (
         while (r >= 1 && r <= 8 && c >= 1 && c <= 8) {
             const nextPosition = getBoardPositionFromRowCol(r, c);
 
-            if (!canMoveTo(board, nextPosition, rookColor)) break;
-            moves.push(nextPosition);
+            if (!canMoveTo(board, nextPosition, rookColor)) {
+                break;
+            }
 
-            // Stop after capturing
-            if (board[nextPosition].currentPiece) break;
+            /*
+
+                If the nextPosition is opposite color piece, add that to the moves
+                Then break
+            
+            */
+
+            moves.push(nextPosition);
 
             r += rowIncrement;
             c += colIncrement;
