@@ -24,7 +24,7 @@ const pieceComponents = {
 };
 
 // Converts position to chess notation
-const toChessNotation = (position: number) => {
+const getChessNotationFromPosition = (position: number) => {
     // Converts 0-7 to 1-8
     const row = 8 - Math.floor(position / 8);
     // Converts 0-7 to a-h
@@ -45,7 +45,7 @@ const getRowColfromBoardPosition = (position: number) => {
 };
 
 export {
-    toChessNotation,
+    getChessNotationFromPosition,
     getBoardPositionFromRowCol,
     getRowColfromBoardPosition,
     ItemTypes,

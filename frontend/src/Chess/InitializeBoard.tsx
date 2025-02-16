@@ -1,5 +1,5 @@
 import { Cell, Piece } from "../Types/Cell.ts";
-import { toChessNotation } from "./Helpers.tsx";
+import { getChessNotationFromPosition } from "./Helpers.tsx";
 
 const initialBoard = [
     ["r", "n", "b", "q", "k", "b", "n", "r"],
@@ -60,7 +60,7 @@ const boardInit = () => {
             color: isWhiteSquare ? "white" : "black",
             currentPiece: piece,
             position: i,
-            notation: toChessNotation(i),
+            notation: getChessNotationFromPosition(i),
         };
 
         chessBoard.push(cell);
