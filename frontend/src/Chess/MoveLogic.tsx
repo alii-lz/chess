@@ -34,6 +34,22 @@ const canMoveTo = (
     return targetSquare.currentPiece.color !== attackingPieceColor;
 };
 
+const doesPositionHaveOpponentPiece = (
+    board: Cell[],
+    positionToCheck: number,
+    attackingPieceColor: string
+) => {
+    const squareToCheck = board[positionToCheck];
+
+    if (!squareToCheck.currentPiece || squareToCheck.currentPiece.type === "") {
+        return false;
+    }
+
+    const color = squareToCheck.currentPiece.color;
+
+    return attackingPieceColor !== color;
+};
+
 const getPawnMoves = (
     pieceColor: string,
     moves: number[],
@@ -88,6 +104,14 @@ const getRookMoves = (
         while (r >= 1 && r <= 8 && c >= 1 && c <= 8) {
             const nextPosition = getBoardPositionFromRowCol(r, c);
 
+            // Check if the current position is enemy piece
+            // if yes - then add the move and then break
+
+            if (doesPositionHaveOpponentPiece(board, nextPosition, rookColor)) {
+                moves.push(nextPosition);
+                break;
+            }
+
             if (!canMoveTo(board, nextPosition, rookColor)) {
                 break;
             }
@@ -120,19 +144,8 @@ const getKnightMoves = (
     col: number,
     board: Cell[]
 ) => {
-    /*
-        Case 1: nextPosition is a white piece.
-            do not add it to the moves
-
-        Case 2: nextPosition is a black piece
-            add it to the moves
-
-    */
-
     const knightPosition = getBoardPositionFromRowCol(row, col);
-
     const knightPiece = board[knightPosition];
-
     const knightColor = knightPiece.currentPiece.color;
 
     const potentialMoves = [
@@ -157,9 +170,9 @@ const getKnightMoves = (
             nextPosition >= 0 &&
             nextPosition < 64
         ) {
-            // if (canKnightCapture(board, nextPosition, knightColor)) {
-            moves.push(nextPosition);
-            // }
+            if (canMoveTo(board, nextPosition, knightColor)) {
+                moves.push(nextPosition);
+            }
         }
     }
 
