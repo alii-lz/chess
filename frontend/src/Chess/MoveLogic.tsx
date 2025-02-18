@@ -116,13 +116,6 @@ const getRookMoves = (
                 break;
             }
 
-            /*
-
-                If the nextPosition is opposite color piece, add that to the moves
-                Then break
-            
-            */
-
             moves.push(nextPosition);
 
             r += rowIncrement;
@@ -192,6 +185,9 @@ const getBishopMoves = (
         let curRow = row;
         let curCol = col;
 
+        const bishopPosition = getBoardPositionFromRowCol(row, col);
+        const bishopColor = board[bishopPosition].currentPiece.color;
+
         while (
             curRow + rowIncrement >= 1 &&
             curRow + rowIncrement <= 8 &&
@@ -202,13 +198,22 @@ const getBishopMoves = (
             const newCol = curCol + colIncrement;
             const nextPosition = getBoardPositionFromRowCol(newRow, newCol);
 
-            if (isSquareOccupied(board, nextPosition)) {
+            if (!(nextPosition >= 0 && nextPosition < 64)) {
+                continue;
+            }
+
+            if (
+                doesPositionHaveOpponentPiece(board, nextPosition, bishopColor)
+            ) {
+                moves.push(nextPosition);
                 break;
             }
 
-            if (nextPosition >= 0 && nextPosition < 64) {
-                moves.push(nextPosition);
+            if (!canMoveTo(board, nextPosition, bishopColor)) {
+                break;
             }
+
+            moves.push(nextPosition);
 
             curRow += rowIncrement;
             curCol += colIncrement;
@@ -252,6 +257,9 @@ const getKingMoves = (
         { r: row - 1, c: col - 1 },
     ];
 
+    const kingPosition = getBoardPositionFromRowCol(row, col);
+    const kingColor = board[kingPosition].currentPiece.color;
+
     for (const move of potentialMoves) {
         const nextPosition = getBoardPositionFromRowCol(move.r, move.c);
         if (
@@ -261,7 +269,7 @@ const getKingMoves = (
             move.c <= 8 &&
             nextPosition >= 0 &&
             nextPosition < 64 &&
-            !isSquareOccupied(board, nextPosition)
+            canMoveTo(board, nextPosition, kingColor)
         ) {
             moves.push(nextPosition);
         }
