@@ -81,6 +81,25 @@ const getPawnMoves = (
                 moves.push(twoStepsPosition);
             }
         }
+
+        const pawnCaptureLeft = getBoardPositionFromRowCol(
+            row + direction,
+            col - 1
+        );
+        const pawnCaptureRight = getBoardPositionFromRowCol(
+            row + direction,
+            col + 1
+        );
+
+        if (doesPositionHaveOpponentPiece(board, pawnCaptureLeft, pieceColor)) {
+            moves.push(pawnCaptureLeft);
+        }
+
+        if (
+            doesPositionHaveOpponentPiece(board, pawnCaptureRight, pieceColor)
+        ) {
+            moves.push(pawnCaptureRight);
+        }
     }
 
     return moves;
