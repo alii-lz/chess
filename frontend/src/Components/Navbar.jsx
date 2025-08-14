@@ -1,5 +1,6 @@
 import React from "react";
 import Knight from "../Images/Knight.svg";
+import { Link, NavLink } from "react-router-dom";
 
 const Navbar = () => {
     return (
@@ -8,41 +9,40 @@ const Navbar = () => {
                 <div className='relative flex h-16 items-center justify-between'>
                     <div className='flex flex-1 items-center justify-center sm:items-stretch sm:justify-start'>
                         <div className='flex shrink-0 items-center'>
-                            <img
-                                className='h-8 w-auto'
-                                src={Knight}
-                                alt='Your Company'
-                            />
+                            <Link to='/' className='flex items-center gap-2'>
+                                <img className='h-8 w-auto' src={Knight} alt='Logo' />
+                                <span className='text-white font-semibold hidden sm:block'>Chess</span>
+                            </Link>
                         </div>
                         <div className='hidden sm:ml-6 sm:block'>
                             <div className='flex space-x-4'>
-                                <a
-                                    href='#'
-                                    className='rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white'
+                                <NavLink
+                                    to='/'
+                                    className={({ isActive }) =>
+                                        `rounded-md px-3 py-2 text-sm font-medium ${isActive ? "bg-gray-900 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`
+                                    }
                                     aria-current='page'
                                 >
-                                    Dashboard
-                                </a>
-                                <a
-                                    href='#'
-                                    className='rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white'
-                                >
-                                    Play
-                                </a>
-                                <a
-                                    href='#'
-                                    className='rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white'
-                                >
-                                    Friends
-                                </a>
-                                <a
-                                    href='#'
-                                    className='rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white'
-                                >
-                                    Profile
-                                </a>
+                                    Board
+                                </NavLink>
                             </div>
                         </div>
+                    </div>
+                    <div className='flex items-center gap-2'>
+                        <NavLink
+                            to='/login'
+                            className={({ isActive }) =>
+                                `rounded-md px-3 py-2 text-sm font-medium ${isActive ? "bg-gray-700 text-white" : "text-gray-200 hover:bg-gray-700 hover:text-white"}`
+                            }
+                        >
+                            Log in
+                        </NavLink>
+                        <Link
+                            to='/signup'
+                            className='rounded-md px-3 py-2 text-sm font-medium bg-gray-100/0 text-white border border-gray-600 hover:bg-gray-700'
+                        >
+                            Sign up
+                        </Link>
                     </div>
                 </div>
             </div>
